@@ -5,7 +5,7 @@
 
 
 
-https://github.com/2020009-CPE/POC/assets/90688553/5b522117-1534-4e61-b62c-781f7236eb11
+<center>https://github.com/2020009-CPE/POC/assets/90688553/5b522117-1534-4e61-b62c-781f7236eb11L</center>
 
 
 
