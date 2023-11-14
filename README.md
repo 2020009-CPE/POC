@@ -1,5 +1,4 @@
 <h1 align="center">P3pDec v.01</h1>
-
 <p align="center">
     <strong>Welcome to the P3pDec v.01 repository!</strong><br>
     An innovative system using piezoelectric materials to harness human movement for sustainable energy generation.
