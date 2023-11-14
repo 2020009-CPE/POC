@@ -11,21 +11,58 @@ model = YOLO('peopledetect.pt')
 
 # Initialize MySQL database connection
 conn = mysql.connector.connect(
-    host='localhost',  # Replace with your MySQL server host
-    user='root',  # Replace with your MySQL username
-    password='',  # Replace with your MySQL password
-    database='peoplecount'  # Replace with your database name
+    host='localhost', 
+    user='root', 
+    password='', 
+    database='peoplecount'
 )
 cursor = conn.cursor()
 
-# Create a table to store the counts if it doesn't exist
+# Create or alter a table to store the counts if it doesn't exist
 cursor.execute('''CREATE TABLE IF NOT EXISTS people_counts (
                     id INT AUTO_INCREMENT PRIMARY KEY,
                     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     person_in INT,
                     person_out INT,
-                    total_count INT
+                    total_count INT,
+                    overall_count INT DEFAULT 0
                 )''')
+
+class PeopleCounter:
+    def __init__(self):
+        self.overall_count = 0
+        self.previous_total_count = 0
+
+    def count_people(self, results):
+        count_in = 0
+        count_out = 0
+
+        for box in results[0].boxes:
+            cords = box.xyxy[0].tolist()
+            cords = [round(x) for x in cords]
+            class_id = results[0].names[box.cls[0].item()]
+
+            if class_id == "PEOPLEIN":
+                count_in += 1
+            elif class_id == "PEOPLEOUT":
+                count_out += 1
+
+        total_count = count_in + count_out
+
+        # Increment overall count based on the increase in total count
+        if total_count > self.previous_total_count:
+            self.overall_count += (total_count - self.previous_total_count)
+
+        # Update the previous total count
+        self.previous_total_count = total_count
+
+        return count_in, count_out, total_count
+
+    def insert_counts_to_db(self, count_in, count_out, total_count):
+        cursor.execute('''INSERT INTO people_counts (person_in, person_out, total_count, overall_count)
+                          VALUES (%s, %s, %s, %s)''', 
+                          (count_in, count_out, total_count, self.overall_count))
+        conn.commit()
 
 class VideoCamera:
     def __init__(self):
@@ -48,47 +85,14 @@ class VideoCamera:
         frame_ = results[0].plot()
 
         # Add the counts below the bounding boxes with white text
-        text = f"Total: {total_count}, In: {count_in}, Out: {count_out}"
-        cv2.putText(frame_, text, (10, frame_.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)  # White color
+        text = f"Total: {total_count}, In: {count_in}, Out: {count_out}, Overall: {self.people_counter.overall_count}"
+        cv2.putText(frame_, text, (10, frame_.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
 
         # Insert counts into the database
-        self.people_counter.insert_counts_to_db()
+        self.people_counter.insert_counts_to_db(count_in, count_out, total_count)
 
         ret, jpeg = cv2.imencode('.jpg', frame_)
         return jpeg.tobytes()
-
-class PeopleCounter:
-    def __init__(self):
-        self.count_in = 0
-        self.count_out = 0
-        self.total_count = 0
-
-    def count_people(self, results):
-        self.count_in = 0
-        self.count_out = 0
-
-        for box in results[0].boxes:
-            cords = box.xyxy[0].tolist()
-            cords = [round(x) for x in cords]
-            class_id = results[0].names[box.cls[0].item()]
-
-            # Extract the color based on class_id
-            color = (0, 0, 0)  # Default color (black)
-
-            if class_id == "PEOPLEIN":
-                color = (0, 165, 255)  # Orange for PEOPLEIN
-                self.count_in += 1
-            elif class_id == "PEOPLEOUT":
-                color = (0, 255, 255)  # Yellow for PEOPLEOUT
-                self.count_out += 1
-
-        self.total_count = self.count_in + self.count_out  # Use addition here
-        return self.count_in, self.count_out, self.total_count
-
-    def insert_counts_to_db(self):
-        cursor.execute('''INSERT INTO people_counts (person_in, person_out, total_count)
-                          VALUES (%s, %s, %s)''', (self.count_in, self.count_out, self.total_count))
-        conn.commit()
 
 @app.route('/')
 def index():
