@@ -3,14 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flow Monitoring System</title>
+    <title>P3pDec v.01</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Ubuntu|Lora">
     <style>
         body {
             text-align: center;
             color: white;
             font-family: Barlow, Segoe UI, Helvetica Neue, Helvetica, Roboto, sans-serif;
             margin: 0;
-            background: linear-gradient(to right, #8E2DE2, #4A00E0) no-repeat center center fixed, url("https://i.imgur.com/zERQeZw.png") no-repeat center center fixed;
+            background: linear-gradient(to right, #9a66ff6e, #2fd39e) no-repeat center center fixed, url() no-repeat center center fixed;
             background-size: cover;
         }
         
@@ -22,15 +23,26 @@
         nav {
             display: flex;
             justify-content: center;
-            font-family: Barlow,Segoe UI,Helvetica Neue,Helvetica,Roboto,sans-serif;
-            background-color: #222222ad;
+            background-color: #2222226e;
+            font-weight: 700;
             padding: 10px;
+            font-family: Ubuntu, sans-serif;
         }
         nav a {
             color: white;
             padding: 10px;
             text-decoration: none;
             margin: 0 10px;
+        }
+        h1 {
+            display: block;
+            font-size: 2em;
+            margin-block-start: 0.67em;
+            margin-block-end: 0.67em;
+            margin-inline-start: 0px;
+            Ubuntu, sans-serif
+            margin-inline-end: 0px;
+            font-weight: bold;
         }
         #container {
             display: flex;
@@ -43,19 +55,21 @@
         }
         img {
             max-width: 100%;
-            border-radius: 9px;
+            border-radius: 28px;
             height: auto;
             display: none;
-            border: 2px solid white;
-            margin-top: 20px;
+            border: 12px solid #151f3229;
+            margin-top: 28px;
             box-sizing: border-box;
         }
         #toggleButton {
             padding: 10px;
-            background-color: #4CAF50;
+            background-color: #4d556152;
+            font-family: Barlow,Segoe UI,Helvetica Neue,Helvetica,Roboto,sans-serif;
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 11px;
+            font-weight: 600;
             cursor: pointer;
             margin-top: 10px;
         }
@@ -66,7 +80,7 @@
             font-size: 20px;
             font-weight: 500;
             margin-inline-start: 0px;
-            font-family: Barlow,Segoe UI,Helvetica Neue,Helvetica,Roboto,sans-serif;
+            font-family: Ubuntu, sans-serif;
             margin-inline-end: 0px;
         }
         
@@ -74,7 +88,7 @@
 </head>
 <body>
     <header>
-        <h1>Flow Monitoring System</h1>
+        <h1>P3pDec v.01</h1>
     </header>
     <nav>
         <a href="#">HOME</a>
@@ -82,7 +96,8 @@
     </nav>
     <div id="container">
         <div id="info">
-            <p>Welcome to the Flow Monitoring System! Click the button below to toggle the live camera.</p>
+            <h1>WELCOME TO OUR PROJECT</h1> 
+            <p>Click the button below to toggle the live camera.</p>
         </div>
         <button id="toggleButton" onclick="toggleCamera()">Toggle Camera</button>
         <img id="liveCamera" src="{{ url_for('video_feed') }}" alt="Object Detection">
